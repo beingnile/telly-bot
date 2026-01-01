@@ -666,29 +666,7 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     logger.info("🚀 Bot starting...")
-    app.initialize()
-    app.start()
-    app.updater.start_polling()
-    
-    # Start FastAPI server on main thread
-    web_app = FastAPI()
-    
-    @web_app.get("/")
-    async def root():
-        return {"status": "Bot running", "bot_username": app.bot.username if app.bot else "unknown"}
-    
-    @web_app.get("/health")
-    async def health():
-        return {"status": "healthy", "timestamp": datetime.now().isoformat()}
-    
-    @web_app.on_event("shutdown")
-    async def shutdown():
-        # Gracefully stop the bot when server shuts down
-        app.updater.stop()
-        app.stop()
-        app.shutdown()
-    
-    uvicorn.run(web_app, host="0.0.0.0", port=10000)
+    app.run_polling()
 
 
 if __name__ == '__main__':
