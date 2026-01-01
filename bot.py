@@ -5,6 +5,8 @@ import json
 import os
 import random
 import asyncio
+import uvicorn
+from fastapi import FastAPI
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
@@ -664,7 +666,14 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     logger.info("🚀 Bot starting...")
-    app.run_polling()
+    import asyncio
+    asyncio.create_task(app.run_polling())
+
+    web_app = FastAPI()
+    @web_app.get("/")
+    async def root():
+        return {"status": "Bot running"}
+    uvicorn.run(web_app, host="0.0.0.0", port=10000)
 
 if __name__ == '__main__':
     main()
